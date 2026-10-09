@@ -1,0 +1,15 @@
+node_modules/
+.env
+
+input/*
+!input/.gitkeep
+
+output/*
+!output/.gitkeep
+
+temp/*
+!temp/.gitkeep
+
+*.log
+
+android/
