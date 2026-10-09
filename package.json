@@ -5,6 +5,7 @@
   "description": "Build engine for converting websites into Android APK and AAB applications",
   "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "build": "node scripts/build.js",
     "create": "node scripts/create-project.js",
     "icons": "node scripts/generate-icons.js",
