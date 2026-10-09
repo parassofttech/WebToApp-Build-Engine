@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Build engine for converting websites into Android APK and AAB applications",
+  "main": "server.js",
   "scripts": {
     "build": "node scripts/build.js",
     "create": "node scripts/create-project.js",
@@ -12,10 +13,11 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
+    "@capacitor/assets": "^3.0.0",
     "@capacitor/cli": "^8.0.0",
     "@capacitor/core": "^8.0.0",
-    "@capacitor/assets": "^3.0.0",
     "dotenv": "^17.0.0",
+    "express": "^5.3.0",
     "sharp": "^0.34.0"
   }
 }
