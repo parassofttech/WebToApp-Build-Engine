@@ -1,4 +1,4 @@
-FROM node:20-bookworm
+FROM node:22-bookworm
 
 # Java JDK aur system dependencies install karein
 RUN apt-get update && apt-get install -y \
