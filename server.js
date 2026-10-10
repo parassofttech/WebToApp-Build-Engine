@@ -255,6 +255,8 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
+console.log("[BUILD ENGINE] POST /api/builds received");
+
 // Create a build
 app.post(
   "/api/builds",
