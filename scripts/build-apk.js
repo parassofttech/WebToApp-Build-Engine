@@ -115,9 +115,13 @@ async function main() {
       ? "gradlew.bat"
       : "./gradlew";
 
-  await run(
+ await run(
     gradleCommand,
-    ["assembleDebug"],
+    [
+      "assembleDebug",
+      "-Dorg.gradle.daemon=false",
+      "-Dorg.gradle.jvmargs=\"-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError\"",
+    ],
     path.join(projectDir, "android")
   );
 
