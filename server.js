@@ -178,22 +178,31 @@ async function runBuild(job) {
 
     let logs = "";
 
-    function onOutput(chunk) {
-      const text = chunk.toString();
+   
+function onOutput(chunk) {
+  const output = chunk.toString();
 
-      logs = (logs + text).slice(-12000);
-      job.logs = logs;
+  // Show actual npm, Capacitor and Gradle output in Render logs.
+  console.log(`[BUILD ${job.buildId}] ${output.trimEnd()}`);
 
-      const match = text.match(/\[(\d+)\/6\]/);
+  logs = (logs + output).slice(-12000);
+  job.logs = logs;
 
-      if (match) {
-        const stage = Number(match[1]);
-        job.progress = Math.min(
-          95,
-          Math.max(job.progress, Math.round(stage / 6 * 100))
-        );
-      }
-    }
+  const match = output.match(/\[(\d+)\/6\]/);
+
+  if (match) {
+    const stage = Number(match[1]);
+
+    job.progress = Math.min(
+      95,
+      Math.max(
+        job.progress,
+        Math.round((stage / 6) * 100)
+      )
+    );
+  }
+}
+
 
     child.stdout.on("data", onOutput);
     child.stderr.on("data", onOutput);
