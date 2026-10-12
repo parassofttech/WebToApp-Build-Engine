@@ -115,15 +115,21 @@ async function main() {
       ? "gradlew.bat"
       : "./gradlew";
 
- await run(
+ 
+  console.log("[DEBUG] Starting Gradle assembleDebug...");
+
+  await run(
     gradleCommand,
     [
       "assembleDebug",
-      "-Dorg.gradle.daemon=false",
-      "-Dorg.gradle.jvmargs=\"-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError\"",
+      "--no-daemon",
+      "--console=plain",
+      "-Dorg.gradle.jvmargs=-Xmx1024m",
     ],
     path.join(projectDir, "android")
   );
+
+  console.log("[DEBUG] Gradle command completed successfully.");
 
   const apkPath = path.join(
     projectDir,
@@ -135,6 +141,13 @@ async function main() {
     "debug",
     "app-debug.apk"
   );
+
+  console.log("[DEBUG] Checking APK:", apkPath);
+
+  await fs.access(apkPath);
+
+  console.log("[DEBUG] APK exists. Preparing to copy...");
+
 
   try {
     await fs.access(apkPath);
