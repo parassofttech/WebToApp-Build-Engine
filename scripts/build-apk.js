@@ -6,21 +6,27 @@ const { spawn } = require("child_process");
 
 const ROOT = path.resolve(__dirname, "..");
 
-
-const ANDROID_HOME =
-  process.env.ANDROID_HOME || "/opt/android-sdk";
-
 const env = {
   ...process.env,
-  JAVA_HOME:
-    process.env.JAVA_HOME ||
-    "/usr/lib/jvm/java-17-openjdk-amd64",
-  ANDROID_HOME,
-  ANDROID_SDK_ROOT:
-    process.env.ANDROID_SDK_ROOT || ANDROID_HOME,
-  PATH: `${process.env.PATH || ""}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools`,
+  JAVA_HOME: process.env.JAVA_HOME,
+  ANDROID_SDK_ROOT: process.env.ANDROID_SDK_ROOT,
 };
 
+
+
+// const ANDROID_HOME =
+//   process.env.ANDROID_HOME || "/opt/android-sdk";
+
+// const env = {
+//   ...process.env,
+//   JAVA_HOME:
+//     process.env.JAVA_HOME ||
+//     "/usr/lib/jvm/java-17-openjdk-amd64",
+//   ANDROID_HOME,
+//   ANDROID_SDK_ROOT:
+//     process.env.ANDROID_SDK_ROOT || ANDROID_HOME,
+//   PATH: `${process.env.PATH || ""}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools`,
+// };
 
 function run(command, args, cwd) {
   return new Promise((resolve, reject) => {
