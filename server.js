@@ -23,7 +23,7 @@ for (const dir of [OUTPUT_DIR, INPUT_DIR, ARTIFACTS_DIR]) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
-app.use(express.json());
+
 
 const jobs = new Map();
 let activeBuild = false;
@@ -50,13 +50,33 @@ const upload = multer({
   },
 });
 
+
 function authorize(req, res, next) {
-  if (!API_KEY || req.get("x-api-key") !== API_KEY) {
-    return res.status(401).json({ error: "Unauthorized" });
+  const configured = Boolean(API_KEY);
+  const received = req.get("x-api-key");
+
+  const authorized =
+    configured &&
+    typeof received === "string" &&
+    received === API_KEY;
+
+  console.log("[BUILD ENGINE] API authentication", {
+    configured,
+    headerReceived: typeof received === "string",
+    authorized,
+    method: req.method,
+    path: req.path,
+  });
+
+  if (!authorized) {
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
   }
 
   next();
 }
+
 
 function validWebsiteUrl(value) {
   try {
@@ -258,15 +278,32 @@ app.get("/api/health", (_req, res) => {
 console.log("[BUILD ENGINE] POST /api/builds received");
 
 // Create a build
+
 app.post(
   "/api/builds",
   authorize,
+  (req, res, next) => {
+    console.log("[BUILD ENGINE] POST authenticated", {
+      contentType: req.headers["content-type"],
+      contentLength: req.headers["content-length"] || "unknown",
+    });
+
+    next();
+  },
   upload.single("logo"),
   (req, res) => {
-    const { url, appName } = req.body;
+    console.log("[BUILD ENGINE] Multipart upload parsed", {
+      hasUrl: Boolean(req.body?.url),
+      hasAppName: Boolean(req.body?.appName),
+      hasLogo: Boolean(req.file),
+    });
+
+    const { url, appName } = req.body || {};
 
     if (!validWebsiteUrl(url)) {
-      if (req.file) fs.rmSync(req.file.path, { force: true });
+      if (req.file) {
+        fs.rmSync(req.file.path, { force: true });
+      }
 
       return res.status(400).json({
         error: "A valid website URL is required.",
@@ -274,7 +311,9 @@ app.post(
     }
 
     if (!validAppName(appName)) {
-      if (req.file) fs.rmSync(req.file.path, { force: true });
+      if (req.file) {
+        fs.rmSync(req.file.path, { force: true });
+      }
 
       return res.status(400).json({
         error: "Invalid app name.",
@@ -297,6 +336,13 @@ app.post(
     };
 
     jobs.set(buildId, job);
+
+    console.log("[BUILD ENGINE] Job created", {
+      buildId,
+      appName: job.appName,
+      status: job.status,
+    });
+
     startNextBuild();
 
     return res.status(202).json({
@@ -307,6 +353,7 @@ app.post(
     });
   }
 );
+
 
 // Check build status
 app.get("/api/builds/:id", authorize, (req, res) => {
