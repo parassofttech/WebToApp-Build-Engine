@@ -8,6 +8,21 @@ const { spawn } = require("child_process");
 require("dotenv").config();
 
 const app = express();
+
+app.use((req, res, next) => {
+  console.log(
+    `[REQUEST] ${req.method} ${req.originalUrl} ${new Date().toISOString()}`
+  );
+
+  res.on("finish", () => {
+    console.log(
+      `[RESPONSE] ${req.method} ${req.originalUrl} ${res.statusCode}`
+    );
+  });
+
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -284,12 +299,16 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-console.log("[BUILD ENGINE] POST /api/builds received");
+
 
 // Create a build
 
 app.post(
   "/api/builds",
+  (req, res, next) => {
+    console.log("[BUILD ENGINE] POST /api/builds received");
+    next();
+  },
   authorize,
   (req, res, next) => {
     console.log("[BUILD ENGINE] POST authenticated", {
